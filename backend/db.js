@@ -3,7 +3,7 @@ const mysql = require('mysql2');
 const pool = mysql.createPool({
     host: "gateway01.ap-northeast-1.prod.aws.tidbcloud.com",
     user: "YmoLqm7MH9XHFcf.root",
-    password: "CbPyvcQQKtPyr7xE", // <--- Put your password here
+    password: "t5zcQIZlM4As9Mzn", // <--- Put your password here
     database: "studypartner",
     port: 4000,
     ssl: {
