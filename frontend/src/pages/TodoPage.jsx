@@ -10,6 +10,9 @@ const TodoPage = () => {
   const [filter, setFilter] = useState('today');
   const userId = parseInt(localStorage.getItem('userId'));
 
+  // Use Render URL
+  const API_URL = 'https://my-study-partner.onrender.com/api';
+
   useEffect(() => {
     fetchTodos();
     fetchTopics();
@@ -17,7 +20,7 @@ const TodoPage = () => {
 
   const fetchTodos = async () => {
     try {
-      const res = await axios.get(`https://my-study-partner.onrender.com/api/todos/${userId}`);
+      const res = await axios.get(`${API_URL}/todos/${userId}`);
       setTodos(res.data);
     } catch (err) {
       alert('Error fetching todos');
@@ -26,7 +29,7 @@ const TodoPage = () => {
 
   const fetchTopics = async () => {
     try {
-      const res = await axios.get(`https://my-study-partner.onrender.com/api/topics/${userId}`);
+      const res = await axios.get(`${API_URL}/topics/${userId}`);
       setTopics(res.data);
     } catch (err) {
       console.error('Error fetching topics');
@@ -38,9 +41,9 @@ const TodoPage = () => {
     if (!title || !dueDate) return alert('Enter title and date');
 
     try {
-      await axios.post('https://my-study-partner.onrender.com/api/todos', {
+      await axios.post(`${API_URL}/todos`, {
         user_id: userId,
-        topic_id: topicId || null, // ✅ allow null
+        topic_id: topicId || null, 
         title,
         due_date: dueDate,
       });
@@ -55,7 +58,7 @@ const TodoPage = () => {
 
   const toggleComplete = async (id, current) => {
     try {
-      await axios.put(`https://my-study-partner.onrender.com/api/todos/complete/${id}`, {
+      await axios.put(`${API_URL}/todos/complete/${id}`, {
         completed: !current,
       });
       fetchTodos();
@@ -66,18 +69,31 @@ const TodoPage = () => {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`https://my-study-partner.onrender.com/api/todos/${id}`);
+      await axios.delete(`${API_URL}/todos/${id}`);
       fetchTodos();
     } catch {
       alert('Error deleting task');
     }
   };
 
-  const toDateOnly = (dateStr) => new Date(dateStr).toISOString().split('T')[0];
+  // ✅ FIX: Safely handle date strings without shifting timezones
+  const toDateOnly = (dateStr) => {
+    if (!dateStr) return '';
+    // If it's already a string like "2025-11-28", return it directly
+    if (typeof dateStr === 'string') {
+        return dateStr.substring(0, 10);
+    }
+    // Fallback for date objects
+    return new Date(dateStr).toISOString().substring(0, 10);
+  };
+
+  // ✅ FIX: Get "Today" based on Local Device Time (India), not Server UTC
   const getToday = () => {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    return today.toISOString().split('T')[0];
+    const d = new Date();
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
   };
 
   const filterTasks = () => {

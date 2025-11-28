@@ -21,7 +21,6 @@ router.get('/:userId', async (req, res) => {
   }
 });
 
-
 // Add new TODO
 router.post('/', async (req, res) => {
   const { user_id, topic_id, title, due_date } = req.body;
@@ -37,27 +36,20 @@ router.post('/', async (req, res) => {
 });
 
 // Mark as complete/incomplete
-// Mark as complete/incomplete
 router.put('/complete/:id', async (req, res) => {
   const { completed } = req.body;
-
   try {
-    console.log(`PUT /complete/${req.params.id} - completed:`, completed); // Debug log
-
+    console.log(`PUT /complete/${req.params.id} - completed:`, completed); 
     await db.query(
       `UPDATE todos SET completed = ? WHERE id = ?`,
-      [completed ? 1 : 0, req.params.id]  // Force value to 0 or 1
+      [completed ? 1 : 0, req.params.id]
     );
-
     res.json({ message: 'Task updated successfully' });
   } catch (err) {
     console.error('Complete update error:', err);
     res.status(500).json({ message: 'Error updating task', error: err.message });
   }
 });
-
-
-
 
 // Delete TODO
 router.delete('/:id', async (req, res) => {
@@ -71,12 +63,10 @@ router.delete('/:id', async (req, res) => {
   }
 });
 
-
 // ---------------------------------------------
 // EXTRA FEATURE ROUTES
 // ---------------------------------------------
 
-// Get today's TODOs
 // ------------------ GET TODAY'S TASKS ------------------
 router.get('/today/:userId', async (req, res) => {
   try {
@@ -170,12 +160,17 @@ router.get('/streak/:userId', async (req, res) => {
     );
 
     let streak = 0;
-    let currentDate = new Date();
+    
+    // ✅ FIX: Force the "Current Date" to be India Time (Asia/Kolkata)
+    // This creates a Date object that matches your timezone, not UTC.
+    let currentDate = new Date(new Date().toLocaleString("en-US", {timeZone: "Asia/Kolkata"}));
 
     for (let row of rows) {
       const perfDate = new Date(row.date);
-      if (perfDate.toDateString() === currentDate.toDateString()) {
+      // Compare only YYYY-MM-DD to avoid hour mismatch
+      if (perfDate.toISOString().split('T')[0] === currentDate.toISOString().split('T')[0]) {
         streak++;
+        // Move back one day
         currentDate.setDate(currentDate.getDate() - 1);
       } else {
         break;
@@ -188,6 +183,5 @@ router.get('/streak/:userId', async (req, res) => {
     res.status(500).json({ message: 'Failed to fetch streak', error: err.message });
   }
 });
-
 
 module.exports = router;
