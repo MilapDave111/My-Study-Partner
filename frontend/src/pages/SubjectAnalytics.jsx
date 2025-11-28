@@ -12,7 +12,7 @@ const SubjectAnalytics = () => {
     const fetchAnalytics = async () => {
       setLoading(true);
       try {
-        const res = await axios.get(`http://localhost:5000/api/subjects/analytics/${userId}`);
+        const res = await axios.get(`https://my-study-partner.onrender.com/api/subjects/analytics/${userId}`);
         setAnalytics(res.data);
       } catch (err) {
         console.error("Error fetching subject analytics", err);
@@ -27,7 +27,7 @@ const SubjectAnalytics = () => {
     e.preventDefault();
     if (!subjectName.trim()) return;
     try {
-      await axios.post('http://localhost:5000/api/subjects/add', {
+      await axios.post('https://my-study-partner.onrender.com/api/subjects/add', {
         user_id: userId,
         name: subjectName
       });

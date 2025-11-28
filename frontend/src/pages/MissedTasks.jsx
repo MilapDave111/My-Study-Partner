@@ -6,7 +6,7 @@ const MissedTasks = () => {
   const [tasks, setTasks] = useState([]);
 
   useEffect(() => {
-    axios.get(`http://localhost:5000/api/todos/missed/${userId}`)
+    axios.get(`https://my-study-partner.onrender.com/api/todos/missed/${userId}`)
       .then((res) => setTasks(res.data))
       .catch(() => alert('Failed to load missed tasks'));
   }, []);

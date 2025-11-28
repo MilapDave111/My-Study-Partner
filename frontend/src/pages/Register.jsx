@@ -7,7 +7,7 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post('http://localhost:5000/api/auth/register', user);
+      const res = await axios.post('https://my-study-partner.onrender.com/api/auth/register', user);
       alert(res.data.message);
       setUser({ name: '', email: '', password: '' });
     } catch (err) {

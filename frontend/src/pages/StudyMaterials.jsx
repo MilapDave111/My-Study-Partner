@@ -14,12 +14,12 @@ const StudyMaterials = () => {
   });
 
   const fetchTopics = async () => {
-    const res = await axios.get(`http://localhost:5000/api/topics/${userId}`);
+    const res = await axios.get(`https://my-study-partner.onrender.com/api/topics/${userId}`);
     setTopics(res.data);
   };
 
   const fetchMaterials = async () => {
-    const res = await axios.get(`http://localhost:5000/api/materials/${userId}`);
+    const res = await axios.get(`https://my-study-partner.onrender.com/api/materials/${userId}`);
     setMaterials(res.data);
   };
 
@@ -47,7 +47,7 @@ const StudyMaterials = () => {
     data.append('file', file);
 
     try {
-      await axios.post('http://localhost:5000/api/materials', data);
+      await axios.post('https://my-study-partner.onrender.com/api/materials', data);
       setForm({ title: '', topic_id: '', file_type: 'pdf', description: '', file: null });
       fetchMaterials();
     } catch (err) {
@@ -57,7 +57,7 @@ const StudyMaterials = () => {
 
   const handleDelete = async (id) => {
     if (!window.confirm('Delete this material?')) return;
-    await axios.delete(`http://localhost:5000/api/materials/${id}`);
+    await axios.delete(`https://my-study-partner.onrender.com/api/materials/${id}`);
     fetchMaterials();
   };
 

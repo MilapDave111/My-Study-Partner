@@ -11,7 +11,7 @@ const NotesPage = () => {
 
   const fetchTopics = async () => {
     try {
-      const res = await axios.get(`http://localhost:5000/api/topics/${userId}`);
+      const res = await axios.get(`https://my-study-partner.onrender.com/api/topics/${userId}`);
       setTopics(res.data);
     } catch {
       console.error('Failed to load topics');
@@ -20,7 +20,7 @@ const NotesPage = () => {
 
   const fetchNotes = async () => {
     try {
-      const res = await axios.get(`http://localhost:5000/api/notes/${userId}`);
+      const res = await axios.get(`https://my-study-partner.onrender.com/api/notes/${userId}`);
       setNotes(res.data);
     } catch {
       console.error('Failed to load notes');
@@ -38,9 +38,9 @@ const NotesPage = () => {
 
     try {
       if (editingNoteId) {
-        await axios.put(`http://localhost:5000/api/notes/${editingNoteId}`, { content });
+        await axios.put(`https://my-study-partner.onrender.com/api/notes/${editingNoteId}`, { content });
       } else {
-        await axios.post(`http://localhost:5000/api/notes`, {
+        await axios.post(`https://my-study-partner.onrender.com/api/notes`, {
           user_id: userId,
           topic_id: selectedTopic,
           content,
@@ -64,7 +64,7 @@ const NotesPage = () => {
   const handleDelete = async (id) => {
     if (!window.confirm('Are you sure you want to delete this note?')) return;
     try {
-      await axios.delete(`http://localhost:5000/api/notes/${id}`);
+      await axios.delete(`https://my-study-partner.onrender.com/api/notes/${id}`);
       fetchNotes();
     } catch {
       alert('Error deleting note');

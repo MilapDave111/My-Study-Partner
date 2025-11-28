@@ -10,7 +10,7 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post('http://localhost:5000/api/auth/login', form);
+      const res = await axios.post('https://my-study-partner.onrender.com/api/auth/login', form);
       alert(res.data.message);
       localStorage.setItem('token', res.data.token);
       localStorage.setItem('userId', res.data.user.id);

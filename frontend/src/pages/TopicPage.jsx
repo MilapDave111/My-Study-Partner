@@ -12,7 +12,7 @@ const TopicPage = () => {
 
   const fetchTopics = async () => {
     try {
-      const res = await axios.get(`http://localhost:5000/api/topics/${userId}`);
+      const res = await axios.get(`https://my-study-partner.onrender.com/api/topics/${userId}`);
       setTopics(res.data);
     } catch {
       alert('Failed to fetch topics');
@@ -21,7 +21,7 @@ const TopicPage = () => {
 
   const fetchSubjects = async () => {
     try {
-      const res = await axios.get(`http://localhost:5000/api/subjects/user/${userId}`);
+      const res = await axios.get(`https://my-study-partner.onrender.com/api/subjects/user/${userId}`);
       setSubjects(res.data);
     } catch {
       alert('Failed to fetch subjects');
@@ -40,7 +40,7 @@ const TopicPage = () => {
     }
 
     try {
-      await axios.post(`http://localhost:5000/api/topics`, {
+      await axios.post(`https://my-study-partner.onrender.com/api/topics`, {
         user_id: userId,
         subject_id: subjectId || null,
         title,
@@ -60,7 +60,7 @@ const TopicPage = () => {
   const handleUpdateRating = async (id, newRating) => {
     if (newRating < 0 || newRating > 5) return alert('Rating must be between 0 and 5');
     try {
-      await axios.put(`http://localhost:5000/api/topics/${id}`, {
+      await axios.put(`https://my-study-partner.onrender.com/api/topics/${id}`, {
         rating: parseInt(newRating),
       });
       fetchTopics();
@@ -72,7 +72,7 @@ const TopicPage = () => {
   const handleDelete = async (id) => {
     if (!window.confirm('Are you sure you want to delete this topic?')) return;
     try {
-      await axios.delete(`http://localhost:5000/api/topics/${id}`);
+      await axios.delete(`https://my-study-partner.onrender.com/api/topics/${id}`);
       fetchTopics();
     } catch {
       alert('Failed to delete topic');

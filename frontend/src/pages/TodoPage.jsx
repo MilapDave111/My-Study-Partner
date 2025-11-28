@@ -17,7 +17,7 @@ const TodoPage = () => {
 
   const fetchTodos = async () => {
     try {
-      const res = await axios.get(`http://localhost:5000/api/todos/${userId}`);
+      const res = await axios.get(`https://my-study-partner.onrender.com/api/todos/${userId}`);
       setTodos(res.data);
     } catch (err) {
       alert('Error fetching todos');
@@ -26,7 +26,7 @@ const TodoPage = () => {
 
   const fetchTopics = async () => {
     try {
-      const res = await axios.get(`http://localhost:5000/api/topics/${userId}`);
+      const res = await axios.get(`https://my-study-partner.onrender.com/api/topics/${userId}`);
       setTopics(res.data);
     } catch (err) {
       console.error('Error fetching topics');
@@ -38,7 +38,7 @@ const TodoPage = () => {
     if (!title || !dueDate) return alert('Enter title and date');
 
     try {
-      await axios.post('http://localhost:5000/api/todos', {
+      await axios.post('https://my-study-partner.onrender.com/api/todos', {
         user_id: userId,
         topic_id: topicId || null, // ✅ allow null
         title,
@@ -55,7 +55,7 @@ const TodoPage = () => {
 
   const toggleComplete = async (id, current) => {
     try {
-      await axios.put(`http://localhost:5000/api/todos/complete/${id}`, {
+      await axios.put(`https://my-study-partner.onrender.com/api/todos/complete/${id}`, {
         completed: !current,
       });
       fetchTodos();
@@ -66,7 +66,7 @@ const TodoPage = () => {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://localhost:5000/api/todos/${id}`);
+      await axios.delete(`https://my-study-partner.onrender.com/api/todos/${id}`);
       fetchTodos();
     } catch {
       alert('Error deleting task');

@@ -13,7 +13,7 @@ const PerformanceGraph = () => {
   // 📊 Fetch graph data
   const fetchGraphData = async () => {
     try {
-      const res = await axios.get(`http://localhost:5000/api/todos/performance/${userId}`);
+      const res = await axios.get(`https://my-study-partner.onrender.com/api/todos/performance/${userId}`);
       setData(res.data);
     } catch (err) {
       alert('Failed to load graph data');
@@ -24,7 +24,7 @@ const PerformanceGraph = () => {
   const handleCalibrate = async () => {
     setLoading(true);
     try {
-      const res = await axios.post(`http://localhost:5000/api/todos/calculate/${userId}`);
+      const res = await axios.post(`https://my-study-partner.onrender.com/api/todos/calculate/${userId}`);
       setLastUpdated(new Date().toLocaleString());
       alert(`✅ Accuracy updated: ${res.data.accuracy}%`);
       fetchGraphData(); // Refresh graph

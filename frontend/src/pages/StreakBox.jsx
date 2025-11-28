@@ -6,7 +6,7 @@ const StreakBox = () => {
   const [streak, setStreak] = useState(0);
 
   useEffect(() => {
-    axios.get(`http://localhost:5000/api/todos/streak/${userId}`)
+    axios.get(`https://my-study-partner.onrender.com/api/todos/streak/${userId}`)
       .then((res) => setStreak(res.data.streak))
       .catch(() => alert('Failed to fetch streak'));
   }, []);

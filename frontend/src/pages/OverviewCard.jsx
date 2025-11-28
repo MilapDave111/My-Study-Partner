@@ -15,9 +15,9 @@ const OverviewCard = () => {
     const fetchData = async () => {
       try {
         const [todoRes, missedRes, streakRes] = await Promise.all([
-          axios.get(`http://localhost:5000/api/todos/${userId}`),
-          axios.get(`http://localhost:5000/api/todos/missed/${userId}`),
-          axios.get(`http://localhost:5000/api/todos/streak/${userId}`)
+          axios.get(`https://my-study-partner.onrender.com/api/todos/${userId}`),
+          axios.get(`https://my-study-partner.onrender.com/api/todos/missed/${userId}`),
+          axios.get(`https://my-study-partner.onrender.com/api/todos/streak/${userId}`)
         ]);
 
         const todos = todoRes.data;
