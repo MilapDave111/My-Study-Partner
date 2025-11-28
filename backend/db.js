@@ -19,26 +19,11 @@ const db = mysql.createConnection({
     port: 4000,
     ssl: {
         rejectUnauthorized: true
-    }
+    },
+    waitForConnections: true,
+    connectionLimit: 10,
+    queueLimit: 0
 });
 
 
-// Simple check to see if it works (Optional but helpful)
-db.getConnection((err, connection) => {
-    if (err) {
-        console.error('❌ Database connection failed:', err.message);
-    } else {
-        console.log('✅ Connected to TiDB Cloud via Pool');
-        connection.release(); // Important: Release it back to the pool
-    }
-});
-
-db.connect((err) => {
-    if (err) {
-        console.error('❌ Database connection failed:', err.stack);
-        return;
-    }
-    console.log('✅ Connected to TiDB Cloud');
-});
-module.exports = db;
 
