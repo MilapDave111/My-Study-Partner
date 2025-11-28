@@ -22,13 +22,6 @@ const db = mysql.createConnection({
     }
 });
 
-// db.connect((err) => {
-//     if (err) {
-//         console.error('❌ Database connection failed:', err.stack);
-//         return;
-//     }
-//     console.log('✅ Connected to TiDB Cloud');
-// });
 
 // Simple check to see if it works (Optional but helpful)
 db.getConnection((err, connection) => {
@@ -40,6 +33,12 @@ db.getConnection((err, connection) => {
     }
 });
 
+db.connect((err) => {
+    if (err) {
+        console.error('❌ Database connection failed:', err.stack);
+        return;
+    }
+    console.log('✅ Connected to TiDB Cloud');
+});
 module.exports = db;
-
 
