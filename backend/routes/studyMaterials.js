@@ -44,7 +44,7 @@ router.post('/', upload.single('file'), async (req, res) => {
 
     // Insert into Database
     await db.query(`
-      INSERT INTO study_materials (user_id, topic_id, title, fileUrl, file_type, description)
+      INSERT INTO study_materials (user_id, topic_id, title, file_url, file_type, description)
       VALUES (?, ?, ?, ?, ?, ?)`,
       [user_id, topic_id, title, fileUrl, file_type, description]
     );
