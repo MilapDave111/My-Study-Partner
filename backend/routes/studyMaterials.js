@@ -40,16 +40,16 @@ router.post('/', upload.single('file'), async (req, res) => {
     const { user_id, topic_id, title, file_type, description } = req.body;
     
     // THIS IS THE FIX: Cloudinary gives you a hosted URL directly.
-    const file_link = req.file.path; 
+    const fileUrl = req.file.path; 
 
     // Insert into Database
     await db.query(`
-      INSERT INTO study_materials (user_id, topic_id, title, file_link, file_type, description)
+      INSERT INTO study_materials (user_id, topic_id, title, fileUrl, file_type, description)
       VALUES (?, ?, ?, ?, ?, ?)`,
-      [user_id, topic_id, title, file_link, file_type, description]
+      [user_id, topic_id, title, fileUrl, file_type, description]
     );
 
-    res.json({ message: 'File uploaded successfully', url: file_link });
+    res.json({ message: 'File uploaded successfully', url: fileUrl });
 
   } catch (err) {
     console.error('🔥 Upload Error:', err);
@@ -61,7 +61,16 @@ router.post('/', upload.single('file'), async (req, res) => {
 router.get('/:userId', async (req, res) => {
   try {
     const [rows] = await db.query(`
-      SELECT sm.*, t.title AS topic_title
+      SELECT 
+        sm.id, 
+        sm.user_id, 
+        sm.topic_id, 
+        sm.title, 
+        sm.file_url AS file_link,  -- RENAME HERE using AS
+        sm.file_type, 
+        sm.description, 
+        sm.uploaded_at,
+        t.title AS topic_title
       FROM study_materials sm
       JOIN topics t ON sm.topic_id = t.id
       WHERE sm.user_id = ?
