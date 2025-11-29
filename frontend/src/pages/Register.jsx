@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const Register = () => {
+  const navigate = useNavigate()
   const [user, setUser] = useState({ name: '', email: '', password: '' });
 
   const handleSubmit = async (e) => {
@@ -10,6 +12,7 @@ const Register = () => {
       const res = await axios.post('https://my-study-partner.onrender.com/api/auth/register', user);
       alert(res.data.message);
       setUser({ name: '', email: '', password: '' });
+      navigate('/login');
     } catch (err) {
       alert(err.response.data.message || 'Registration failed');
     }
