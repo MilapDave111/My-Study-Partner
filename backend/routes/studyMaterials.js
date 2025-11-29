@@ -39,12 +39,12 @@ router.post('/', upload.single('file'), async (req, res) => {
 
     const { user_id, topic_id, title, file_type, description } = req.body;
     
-    // THIS IS THE FIX: Cloudinary gives you a hosted URL directly.
+    // 1. Get the URL from Cloudinary
     const fileUrl = req.file.path; 
 
-    // Insert into Database
+    // 2. Insert into DB using 'file_link'
     await db.query(`
-      INSERT INTO study_materials (user_id, topic_id, title, file_url, file_type, description)
+      INSERT INTO study_materials (user_id, topic_id, title, file_link, file_type, description)
       VALUES (?, ?, ?, ?, ?, ?)`,
       [user_id, topic_id, title, fileUrl, file_type, description]
     );
