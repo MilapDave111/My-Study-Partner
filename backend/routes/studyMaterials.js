@@ -26,7 +26,7 @@ router.post('/', upload.single('file'), async (req, res) => {
     console.log('📥 Body:', req.body);
 
     const { user_id, topic_id, title, file_type, description } = req.body;
-    const file_link = `http://localhost:5000/api/materials/files/${req.file.filename}`;
+    const file_link = `https://my-study-partner.onrender.com/api/materials/files/${req.file.filename}`;
 
     await db.query(`
       INSERT INTO study_materials (user_id, topic_id, title, file_link, file_type, description)
