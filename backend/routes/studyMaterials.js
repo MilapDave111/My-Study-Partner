@@ -1,48 +1,63 @@
 const express = require('express');
-const multer = require('multer');
-const path = require('path');
 const router = express.Router();
 const db = require('../db');
+require('dotenv').config(); // Load env vars
 
-// Multer config
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, 'uploads/');
-  },
-  filename: function (req, file, cb) {
-    const uniqueName = Date.now() + '-' + file.originalname;
-    cb(null, uniqueName);
+// 1. IMPORT CLOUDINARY MODULES
+const cloudinary = require('cloudinary').v2;
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
+const multer = require('multer');
+
+// 2. CONFIGURE CLOUDINARY
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET
+});
+
+// 3. SET UP STORAGE ENGINE
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: 'study-materials', // The folder name in your Cloudinary dashboard
+    resource_type: 'auto',     // CRITICAL: Allows uploading PDFs, Images, and Videos
+    // format: async (req, file) => 'png', // keep commented to keep original format
   },
 });
-const upload = multer({ storage });
 
-// Serve uploaded files statically
-router.use('/files', express.static(path.join(__dirname, '..', 'uploads')));
+const upload = multer({ storage: storage });
 
-// Upload material (with file)
+// 4. POST ROUTE (UPLOAD)
 router.post('/', upload.single('file'), async (req, res) => {
   try {
-    console.log('📥 Received file:', req.file);
-    console.log('📥 Body:', req.body);
+    // Check if file is missing
+    if (!req.file) {
+      return res.status(400).json({ message: 'No file uploaded' });
+    }
+
+    console.log('📥 Cloudinary File Info:', req.file);
 
     const { user_id, topic_id, title, file_type, description } = req.body;
-    const file_link = `https://my-study-partner.onrender.com/api/materials/files/${req.file.filename}`;
+    
+    // THIS IS THE FIX: Cloudinary gives you a hosted URL directly.
+    const file_link = req.file.path; 
 
+    // Insert into Database
     await db.query(`
       INSERT INTO study_materials (user_id, topic_id, title, file_link, file_type, description)
       VALUES (?, ?, ?, ?, ?, ?)`,
       [user_id, topic_id, title, file_link, file_type, description]
     );
 
-    res.json({ message: 'File uploaded successfully' });
+    res.json({ message: 'File uploaded successfully', url: file_link });
+
   } catch (err) {
-    console.error('🔥 Upload error:', err);
+    console.error('🔥 Upload Error:', err);
     res.status(500).json({ message: 'Upload failed', error: err.message });
   }
 });
 
-
-// Get all materials
+// 5. GET ROUTE (Fetch)
 router.get('/:userId', async (req, res) => {
   try {
     const [rows] = await db.query(`
@@ -59,9 +74,11 @@ router.get('/:userId', async (req, res) => {
   }
 });
 
-// Delete
+// 6. DELETE ROUTE
 router.delete('/:id', async (req, res) => {
   try {
+    // Note: This deletes the record from MySQL, but keeps the file in Cloudinary.
+    // To delete from Cloudinary, you would need the 'public_id' stored in DB.
     await db.query('DELETE FROM study_materials WHERE id = ?', [req.params.id]);
     res.json({ message: 'Material deleted' });
   } catch (err) {
