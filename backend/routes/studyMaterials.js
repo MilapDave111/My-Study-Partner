@@ -66,7 +66,7 @@ router.get('/:userId', async (req, res) => {
         sm.user_id, 
         sm.topic_id, 
         sm.title, 
-        sm.file_url AS file_link,  -- RENAME HERE using AS
+        sm.file_link,   -- CORRECTED: Select the actual column containing data
         sm.file_type, 
         sm.description, 
         sm.uploaded_at,
@@ -79,6 +79,7 @@ router.get('/:userId', async (req, res) => {
     );
     res.json(rows);
   } catch (err) {
+    console.error("Fetch error:", err);
     res.status(500).json({ message: 'Failed to fetch materials', error: err.message });
   }
 });
