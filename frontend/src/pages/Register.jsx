@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 
 const Register = () => {
   const navigate = useNavigate()
@@ -50,6 +50,16 @@ const Register = () => {
           Register
         </button>
       </form>
+
+      {/* Added Navigation Link */}
+      <div className="mt-4 text-center">
+        <p className="text-sm text-gray-600">
+          Already have an account?{' '}
+          <Link to="/login" className="text-indigo-600 hover:text-indigo-800 font-medium">
+            Login
+          </Link>
+        </p>
+      </div>
     </div>
   );
 };

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 
 const Login = () => {
   const [form, setForm] = useState({ email: '', password: '' });
@@ -16,7 +16,7 @@ const Login = () => {
       localStorage.setItem('userId', res.data.user.id);
       navigate('/')
     } catch (err) {
-      alert(err.response.data.message || 'Login failed');
+      alert(err.response?.data?.message || 'Login failed');
     }
   };
 
@@ -50,6 +50,16 @@ const Login = () => {
         >
           Login
         </button>
+
+        {/* Added Navigation Link */}
+        <div className="mt-4 text-center">
+          <p className="text-sm text-gray-600">
+            Don't have an account?{' '}
+            <Link to="/register" className="text-indigo-600 hover:text-indigo-800 font-medium">
+              Register
+            </Link>
+          </p>
+        </div>
       </form>
     </div>
   );
