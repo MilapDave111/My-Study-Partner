@@ -7,6 +7,8 @@ import StudyMaterials from './StudyMaterials';
 import OverviewCard from './OverviewCard';
 import { useNavigate } from 'react-router-dom';
 import SubjectAnalytics from './SubjectAnalytics';
+import Logout from './Logout';
+
 
 const Dashboard = () => {
   const [activeTab, setActiveTab] = useState('overview');
@@ -24,6 +26,7 @@ const Dashboard = () => {
     { key: 'graph', label: 'Accuracy Graph' },
     { key: 'materials', label: 'Study Materials' },
     { key: 'analytics', label: 'Subject-Wise Analytics' },
+    { key: 'logout', label: 'Logout' }
   ];
 
   return (
@@ -52,6 +55,7 @@ const Dashboard = () => {
         {activeTab === 'graph' && <PerformanceGraph />}
         {activeTab === 'materials' && <StudyMaterials />}
         {activeTab === 'analytics' && <SubjectAnalytics />}
+        {activeTab === 'logut' && <Logout />}
         
 
       </div>
