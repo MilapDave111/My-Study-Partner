@@ -66,23 +66,39 @@ const PerformanceGraph = () => {
   {data.length === 0 ? (
     <p className="text-gray-500 text-sm">No performance data available yet.</p>
   ) : (
-    <div className="w-full">
+   <div className="w-full mt-4">
+  {/* Scroll Container */}
+  <div className="overflow-x-auto pb-2">
+    
+    {/* Inner wrapper that prevents squishing on mobile */}
+    <div className="min-w-[650px] sm:min-w-full">
+      
       <ResponsiveContainer width="100%" height={300}>
         <LineChart data={data}>
           <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="date" />
-          <YAxis domain={[0, 100]} />
+          <XAxis 
+            dataKey="date" 
+            interval="preserveStartEnd"
+            tick={{ fontSize: 10 }} 
+          />
+          <YAxis domain={[0, 100]} tick={{ fontSize: 10 }} />
           <Tooltip />
-          <Legend />
+          <Legend wrapperStyle={{ fontSize: "12px" }} />
           <Line
             type="monotone"
             dataKey="accuracy"
             stroke="#6366f1"
-            activeDot={{ r: 0.1 }}
+            strokeWidth={2}
+            dot={false}              // remove dots to reduce clutter
+            activeDot={{ r: 4 }}     // highlight only current touch point
           />
         </LineChart>
       </ResponsiveContainer>
+
     </div>
+  </div>
+</div>
+
   )}
 </div>
 
