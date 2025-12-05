@@ -52,6 +52,12 @@ const Dashboard = () => {
             {tab.label}
           </button>
         ))}
+        <button
+        onClick={handleLogout}
+        className="px-5 py-2 rounded-full font-medium transition-all duration-200 bg-indigo-600 text-white shadow-md"
+      >
+        Logout
+      </button>
       </div>
 
       <div className="bg-white shadow-md rounded-lg p-4">
@@ -61,15 +67,6 @@ const Dashboard = () => {
         {activeTab === 'graph' && <PerformanceGraph />}
         {activeTab === 'materials' && <StudyMaterials />}
         {activeTab === 'analytics' && <SubjectAnalytics />}
-
-      <button
-        onClick={handleLogout}
-        className="px-5 py-2 rounded-full font-medium transition-all duration-200 bg-indigo-600 text-white shadow-md"
-      >
-        Logout
-      </button>
-
-
       </div>
 
     </div>
