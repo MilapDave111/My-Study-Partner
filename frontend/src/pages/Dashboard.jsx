@@ -7,18 +7,25 @@ import StudyMaterials from './StudyMaterials';
 import OverviewCard from './OverviewCard';
 import { useNavigate } from 'react-router-dom';
 import SubjectAnalytics from './SubjectAnalytics';
-import Logout from './Logout';
+
+
 
 
 const Dashboard = () => {
   const [activeTab, setActiveTab] = useState('overview');
   const navigate = useNavigate();
-
+  
   useEffect(() => {
     const userId = localStorage.getItem('userId');
     if (!userId) navigate('/login');
   }, [navigate]);
-
+  
+  const handleLogout = () => {
+    localStorage.removeItem("token");    
+    localStorage.removeItem("userId");    
+    window.location.href = "/login";   
+  };
+  
   const tabs = [
     { key: 'overview', label: 'Overview' },
     { key: 'topics', label: 'Topics' },
@@ -26,7 +33,6 @@ const Dashboard = () => {
     { key: 'graph', label: 'Accuracy Graph' },
     { key: 'materials', label: 'Study Materials' },
     { key: 'analytics', label: 'Subject-Wise Analytics' },
-    { key: 'logout', label: 'Logout' }
   ];
 
   return (
@@ -39,8 +45,8 @@ const Dashboard = () => {
             key={tab.key}
             onClick={() => setActiveTab(tab.key)}
             className={`px-5 py-2 rounded-full font-medium transition-all duration-200 
-              ${activeTab === tab.key 
-                ? 'bg-indigo-600 text-white shadow-md' 
+              ${activeTab === tab.key
+                ? 'bg-indigo-600 text-white shadow-md'
                 : 'bg-white border border-indigo-300 text-indigo-600 hover:bg-indigo-50'}`}
           >
             {tab.label}
@@ -55,10 +61,17 @@ const Dashboard = () => {
         {activeTab === 'graph' && <PerformanceGraph />}
         {activeTab === 'materials' && <StudyMaterials />}
         {activeTab === 'analytics' && <SubjectAnalytics />}
-        {activeTab === 'logut' && <Logout />}
-        
+
+
 
       </div>
+      <button
+        onClick={handleLogout}
+        className="bg-indigo-600 text-white shadow-md"
+      >
+        Logout
+      </button>
+
     </div>
   );
 };
