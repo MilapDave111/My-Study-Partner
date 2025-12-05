@@ -2,12 +2,67 @@ const express = require('express');
 const router = express.Router();
 const db = require('../db');
 
-// ---------------------------------------------
+// ------------------------------------------------------
+// AUTO-FILL MISSING PERFORMANCE ENTRIES (INTELLIGENT)
+// ------------------------------------------------------
+async function fillMissingPerformance(userId) {
+  try {
+    // Fetch last performance date
+    const [last] = await db.query(
+      "SELECT date FROM performance WHERE user_id=? ORDER BY date DESC LIMIT 1",
+      [userId]
+    );
+
+    // today's date in Indian timezone
+    let today = new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Kolkata" }));
+    today.setHours(0, 0, 0, 0);
+
+    // If user has no performance history, do nothing
+    if (last.length === 0) return;
+
+    let lastDate = new Date(last[0].date);
+    lastDate.setHours(0, 0, 0, 0);
+
+    // Loop through each missing day
+    while (lastDate < today) {
+      lastDate.setDate(lastDate.getDate() + 1);
+
+      // Format missingDate as YYYY-MM-DD for SQL
+      let missingDate = lastDate.toISOString().split("T")[0];
+
+      // Fetch todos of this missed day
+      const [todos] = await db.query(
+        `SELECT * FROM todos 
+         WHERE user_id = ? AND DATE(due_date) = ?`,
+        [userId, missingDate]
+      );
+
+      const totalTasks = todos.length;
+      const completedTasks = 0;
+      const accuracy = 0;
+
+      // Insert intelligent performance entry
+      await db.query(
+        `INSERT INTO performance 
+          (user_id, topic_id, date, accuracy, time_spent_minutes, total_tasks, completed_tasks, extra_completed)
+         VALUES (?, NULL, ?, ?, 0, ?, ?, 0)
+         ON DUPLICATE KEY UPDATE accuracy = accuracy`,
+        [userId, missingDate, accuracy, totalTasks, completedTasks]
+      );
+    }
+  } catch (err) {
+    console.error("Error filling missing performance:", err);
+  }
+}
+
+// ------------------------------------------------------
 // BASIC TODO ROUTES
-// ---------------------------------------------
+// ------------------------------------------------------
 
 router.get('/:userId', async (req, res) => {
   try {
+    await fillMissingPerformance(req.params.userId);
+
     const [rows] = await db.query(
       `SELECT t.*, tp.title AS topic_title
        FROM todos t
@@ -39,7 +94,7 @@ router.post('/', async (req, res) => {
 router.put('/complete/:id', async (req, res) => {
   const { completed } = req.body;
   try {
-    console.log(`PUT /complete/${req.params.id} - completed:`, completed); 
+    console.log(`PUT /complete/${req.params.id} - completed:`, completed);
     await db.query(
       `UPDATE todos SET completed = ? WHERE id = ?`,
       [completed ? 1 : 0, req.params.id]
@@ -63,13 +118,15 @@ router.delete('/:id', async (req, res) => {
   }
 });
 
-// ---------------------------------------------
+// ------------------------------------------------------
 // EXTRA FEATURE ROUTES
-// ---------------------------------------------
+// ------------------------------------------------------
 
-// ------------------ GET TODAY'S TASKS ------------------
+// GET TODAY'S TASKS
 router.get('/today/:userId', async (req, res) => {
   try {
+    await fillMissingPerformance(req.params.userId);
+
     const [rows] = await db.query(
       `SELECT t.*, tp.title AS topic_title
        FROM todos t
@@ -80,12 +137,12 @@ router.get('/today/:userId', async (req, res) => {
     );
     res.json(rows);
   } catch (err) {
-    console.error('Today\'s tasks error:', err);
-    res.status(500).json({ message: 'Failed to fetch today\'s tasks', error: err.message });
+    console.error("Today's tasks error:", err);
+    res.status(500).json({ message: "Failed to fetch today tasks", error: err.message });
   }
 });
 
-// ------------------ GET MISSED TASKS ------------------
+// GET MISSED TASKS
 router.get('/missed/:userId', async (req, res) => {
   try {
     const [missed] = await db.query(
@@ -102,9 +159,12 @@ router.get('/missed/:userId', async (req, res) => {
   }
 });
 
-// --------- CALCULATE TODAY'S PERFORMANCE ACCURACY ---------
+// CALCULATE TODAY PERFORMANCE
 router.post('/calculate/:userId', async (req, res) => {
   const userId = req.params.userId;
+
+  await fillMissingPerformance(userId);
+
   try {
     const [todos] = await db.query(
       `SELECT * FROM todos WHERE user_id = ? AND DATE(due_date) = CURDATE()`,
@@ -119,10 +179,11 @@ router.post('/calculate/:userId', async (req, res) => {
     const accuracy = Math.round((completed / todos.length) * 100);
 
     await db.query(
-      `INSERT INTO performance (user_id, date, accuracy)
-       VALUES (?, CURDATE(), ?)
-       ON DUPLICATE KEY UPDATE accuracy = ?`,
-      [userId, accuracy, accuracy]
+      `INSERT INTO performance 
+        (user_id, date, accuracy, total_tasks, completed_tasks)
+       VALUES (?, CURDATE(), ?, ?, ?)
+       ON DUPLICATE KEY UPDATE accuracy = ?, total_tasks=?, completed_tasks=?`,
+      [userId, accuracy, todos.length, completed, accuracy, todos.length, completed]
     );
 
     res.json({ message: 'Accuracy updated', accuracy });
@@ -132,7 +193,7 @@ router.post('/calculate/:userId', async (req, res) => {
   }
 });
 
-// ------------------ GET PERFORMANCE GRAPH DATA ------------------
+// GET PERFORMANCE GRAPH
 router.get('/performance/:userId', async (req, res) => {
   try {
     const [rows] = await db.query(
@@ -148,7 +209,7 @@ router.get('/performance/:userId', async (req, res) => {
   }
 });
 
-// ------------------ GET STREAK ------------------
+// GET STREAK
 router.get('/streak/:userId', async (req, res) => {
   const userId = req.params.userId;
   try {
@@ -161,16 +222,15 @@ router.get('/streak/:userId', async (req, res) => {
 
     let streak = 0;
     
-    // ✅ FIX: Force the "Current Date" to be India Time (Asia/Kolkata)
-    // This creates a Date object that matches your timezone, not UTC.
-    let currentDate = new Date(new Date().toLocaleString("en-US", {timeZone: "Asia/Kolkata"}));
+    let currentDate = new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Kolkata" }));
+    currentDate.setHours(0,0,0,0);
 
     for (let row of rows) {
       const perfDate = new Date(row.date);
-      // Compare only YYYY-MM-DD to avoid hour mismatch
-      if (perfDate.toISOString().split('T')[0] === currentDate.toISOString().split('T')[0]) {
+      perfDate.setHours(0,0,0,0);
+
+      if (perfDate.getTime() === currentDate.getTime()) {
         streak++;
-        // Move back one day
         currentDate.setDate(currentDate.getDate() - 1);
       } else {
         break;
