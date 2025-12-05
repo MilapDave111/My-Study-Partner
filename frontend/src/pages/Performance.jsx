@@ -78,7 +78,7 @@ const PerformanceGraph = () => {
             type="monotone"
             dataKey="accuracy"
             stroke="#6366f1"
-            activeDot={{ r: 6 }}
+            activeDot={{ r: 0.1 }}
           />
         </LineChart>
       </ResponsiveContainer>
