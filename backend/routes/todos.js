@@ -209,27 +209,31 @@ router.get('/performance/:userId', async (req, res) => {
   }
 });
 
-// GET STREAK
 router.get('/streak/:userId', async (req, res) => {
   const userId = req.params.userId;
+
   try {
     const [rows] = await db.query(
-      `SELECT date FROM performance
-       WHERE user_id = ? AND accuracy = 100
-       ORDER BY date DESC`,
+      `
+      SELECT DISTINCT DATE(date) AS study_date
+      FROM performance
+      WHERE user_id = ?
+        AND accuracy = 100
+      ORDER BY study_date DESC
+      `,
       [userId]
     );
 
     let streak = 0;
-    
-    let currentDate = new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Kolkata" }));
-    currentDate.setHours(0,0,0,0);
+
+    let currentDate = new Date();
+    currentDate.setHours(0, 0, 0, 0);
 
     for (let row of rows) {
-      const perfDate = new Date(row.date);
-      perfDate.setHours(0,0,0,0);
+      const dbDate = new Date(row.study_date);
+      dbDate.setHours(0, 0, 0, 0);
 
-      if (perfDate.getTime() === currentDate.getTime()) {
+      if (dbDate.getTime() === currentDate.getTime()) {
         streak++;
         currentDate.setDate(currentDate.getDate() - 1);
       } else {
@@ -240,8 +244,44 @@ router.get('/streak/:userId', async (req, res) => {
     res.json({ streak });
   } catch (err) {
     console.error('Streak fetch error:', err);
-    res.status(500).json({ message: 'Failed to fetch streak', error: err.message });
+    res.status(500).json({ message: 'Failed to fetch streak' });
   }
 });
+
+
+// // GET STREAK
+// router.get('/streak/:userId', async (req, res) => {
+//   const userId = req.params.userId;
+//   try {
+//     const [rows] = await db.query(
+//       `SELECT date FROM performance
+//        WHERE user_id = ? AND accuracy = 100
+//        ORDER BY date DESC`,
+//       [userId]
+//     );
+
+//     let streak = 0;
+    
+//     let currentDate = new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Kolkata" }));
+//     currentDate.setHours(0,0,0,0);
+
+//     for (let row of rows) {
+//       const perfDate = new Date(row.date);
+//       perfDate.setHours(0,0,0,0);
+
+//       if (perfDate.getTime() === currentDate.getTime()) {
+//         streak++;
+//         currentDate.setDate(currentDate.getDate() - 1);
+//       } else {
+//         break;
+//       }
+//     }
+
+//     res.json({ streak });
+//   } catch (err) {
+//     console.error('Streak fetch error:', err);
+//     res.status(500).json({ message: 'Failed to fetch streak', error: err.message });
+//   }
+// });
 
 module.exports = router;
