@@ -38,3 +38,7 @@ app.use('/api/subjects', subjectRoutes);
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });
+
+app.get("/health", (req, res) => {
+  res.status(200).send("OK");
+});
