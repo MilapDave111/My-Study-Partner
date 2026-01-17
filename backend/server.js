@@ -33,12 +33,12 @@ app.use('/api/todos', todoRoutes);
 app.use('/api/materials', studyMaterialRoutes);
 app.use('/api/subjects', subjectRoutes);
 
+app.get("/health", (req, res) => {
+  res.status(200).send("OK");
+});
 
 // Start server
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });
 
-app.get("/health", (req, res) => {
-  res.status(200).send("OK");
-});
